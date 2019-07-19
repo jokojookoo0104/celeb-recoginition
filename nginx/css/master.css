@@ -1,0 +1,39 @@
+body {
+  background-image : url("../images/bn1.jpg");
+    background-size:     cover;                      /* <------ */
+
+}
+.jumbotron{
+  margin: auto;
+  background-color:rgba(255,255,255,0.6);
+  width: 1000px;
+  padding: 10px;
+  color: black;
+}
+.btn, .label{
+  height: 30px;
+  display: block;
+  width: 30%;
+  background-color: #000000;
+  border: none;
+  margin-bottom: 10px;
+  height: 30px;
+  color: white;
+  text-align: center;
+
+}
+.btn:hover, .btn:active{
+  background-color: #CD5349;
+}
+#upload-file-btn{
+  margin-top: 5px;
+}
+a{
+  color: #CD5349;
+}
+a:hover{
+  color: #000;
+}
+.image{
+  max-width: 700px;
+}

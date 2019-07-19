@@ -1,0 +1,14 @@
+numpy
+pandas
+opencv-python
+Pillow
+matplotlib
+Werkzeug
+flask-cors
+Flask
+keras
+scikit-learn
+tensorflow
+gunicorn
+https://download.pytorch.org/whl/cpu/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
+https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp36-cp36m-linux_x86_64.whl

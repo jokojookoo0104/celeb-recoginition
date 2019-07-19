@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/master.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/static/code.js"></script>
+    <title>Celebirty Face Recognition</title>
+
+      <style>
+    .wrapper{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+
+     /* grid-template-columns:repeat(3, 1fr);*/
+      grid-gap:1em;
+      /* grid-auto-rows:100px; */
+      /*grid-auto-rows: minmax(100px, auto);*/
+     
+    }
+
+
+    .wrapper> div{
+      background:#eee;
+      padding:1em;
+    }
+
+    img.resize {
+      max-width:30%;
+      max-height:30%;
+      
+    }
+
+    .item {
+      display: grid;
+      justify-content: center;
+      align-items: center;
+      /*border: 2px solid black;*/
+      font-size: 3em;
+      
+    }
+
+    .text{
+      text-align: center;
+      color: black;
+
+    }
+
+    .button{
+      align-self: center;
+    }
+
+
+  </style>
+
+  </head>
+  <body>
+    <br><br>
+
+    <div class = 'jumbotron'>
+      <div class = 'text'>
+        <h1>Face Recognition </h1>
+      </div>
+      
+    </div>  
+
+    <div class="wrapper">
+
+      <div class='item'>
+        <img src="{{original_image}}" >
+      </div>
+
+      <div class='item'>
+        <img src="{{ user_image }}" alt="{{ result }}" >
+      </div>
+
+      <div class='item'>
+        <img src = "{{crop_image}}" >
+      </div>
+
+
+
+    </div>
+
+    <div class = 'text'>
+      <h2>Image belong to celebrity {{name}} </h2>
+    </div>  
+
+    <div class='button'>
+        <input type="text" name="" value="Detect another image" class="btn" onclick="location.href='/';">
+    </div>
+
+
+
+
+
+  </body>
+</html>

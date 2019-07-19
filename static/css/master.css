@@ -1,0 +1,163 @@
+body {
+  font-family: "Roboto";                /* <------ */
+}
+.div-bg {
+  width: 100%;
+  min-height: 100vh;
+  background-image: url("../images/bn1.jpg");
+  background-size: cover;
+  position: relative;
+}
+
+.body-postion{
+  position: relative;
+  top: 50%;
+  left: 0%;
+  transform: translateY(10%);
+}
+
+/* || end backgour body */
+
+
+.jumbotron {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: auto;
+  background-color: rgba(255, 255, 255, 0.6);
+  width: 900px;
+  padding: 15px 25px;
+  color: black;
+  z-index: 1;
+}
+
+
+/*  */
+.btn,
+.label {
+  height: 30px;
+  width: 30%;
+  background-color: #000000;
+  border: none;
+  margin-bottom: 10px;
+  height: 30px;
+  color: white;
+  text-align: center;
+
+}
+
+.btn:hover,
+.btn:active {
+  background-color: #CD5349;
+}
+
+/* btn-update */
+#upload-file-btn{
+  margin-top: 5px;
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.name-file{
+  font-size: 16px;
+}
+input[type=file]{
+  padding: 10px 0;
+  font-size: 16px;
+}
+
+.btn-color {
+  color: #fff;
+  background-color: #337ab7;
+  border-color: #2e6da4;
+}
+
+.btn-color:hover {
+  color: #fff;
+  background-color: #286090;
+  border-color: #204d74;
+}
+
+/* end btn-update */
+
+a {
+  color: #CD5349;
+}
+
+a:hover {
+  color: #000;
+}
+
+.image {
+  max-width: 700px;
+}
+
+
+/* done - css */
+
+.wrapper{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+
+ /* grid-template-columns:repeat(3, 1fr);*/
+  grid-gap:1em;
+  /* grid-auto-rows:100px; */
+  /*grid-auto-rows: minmax(100px, auto);*/
+ 
+}
+
+
+.wrapper> div{
+  background:#eee;
+  padding:1em;
+  box-shadow: 0 4px 10px 0 rgba(0,0,0,0.2), 0 4px 20px 0 rgba(0,0,0,0.19);
+}
+
+.item {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  /*border: 2px solid black;*/
+  font-size: 3em;
+}
+.item>img{
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+.title{
+  padding: 1em 0 3em;
+}
+
+.title__bot{
+  padding-top: 3em;
+  padding-bottom: 1em;
+}
+.text{
+  text-align: center;
+  color: black;
+  font-size: 40px;
+  font-weight: 900;
+}
+
+.button{
+  text-align: center;
+  margin: 2em;
+}

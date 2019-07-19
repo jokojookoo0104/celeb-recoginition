@@ -1,0 +1,15 @@
+version: '3.6'
+services:
+  app:
+    container_name: celeb
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - API_URL=celeb.kyanon.digital
+    volumes: 
+      - /data/user/ds_prod/celebShared/predictions:/usr/src/app/face_ss
+    ports: 
+      - 8001:5000
+    environment: 
+      - FLASK_ENV=production
