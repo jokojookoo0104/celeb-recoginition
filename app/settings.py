@@ -10,4 +10,10 @@ DATA_ROOT = os.path.abspath(wk_dir +"/../celebrities-recognition/face")
 
 LOG_FILE = os.path.abspath(wk_dir +"/../celebrities-recognition/logs/application.log")
 
+UPLOAD_FOLDER= './database'
+
+ALLOWED_EXTENSIONS = set(['txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'])
+
+IMG_FOLDER = './face_ss'
+
 PORT = 5000

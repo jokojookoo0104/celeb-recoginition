@@ -10,6 +10,7 @@ import datetime
 import numpy as np
 from monty.serialization import loadfn
 from monty.json import jsanitize
+import zipfile
 
 import logging
 import pickle
@@ -35,14 +36,17 @@ from src.list_model import *
 from keras import backend as K 
 from src.face_detect import face_detect 
 
-UPLOAD_FOLDER = './face_ss'
-ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg']
-
 app = Flask(__name__)
 clf = None
+UPLOAD_FOLDER= './face_ss'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-
+ALLOWED_EXTENSIONS = set(['txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'])
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    
+# load the model, and pass in the custom metric function
+global graph
 model = face_detect()
 
 '''Test'''
@@ -50,16 +54,20 @@ model = face_detect()
 def test():
     return 'Kyanon Computer Vision'
 
+'''importdata'''  
+@app.route('/upload-data',methods=['POST'])
+def upload_data():
+    data = {'success':False}
+    if request.method == 'POST':
+        if request.files['dataset']:
+            dataset = request.files['dataset']
+            filename = secure_filename(dataset.filename)
+            thread=Import_Data(filename,dataset)   
+            thread.start()
+            thread.join()
+            return filename
+    return jsonify(data)
 
-'''check-model'''
-@app.route('/<version>/check', methods=['GET'])
-def check_model(version):
-    if models.get(version,None) is not None:
-        return ("OK",200)
-    else:
-        return ("Not OK",200)
-    
-    
 '''List-models'''
 @app.route('/list-model',methods=['POST','GET'])
 def list_model():
@@ -70,86 +78,6 @@ def list_model():
         data['model_ids'] = model_ids
     return jsonify(data)
 
-
-@app.route('/<version>/predict',methods=['POST'])
-def predict(version):
-    data = {'success':False}
-    if request.method == 'POST':
-        if request.files.get('image'):
-            f = request.files.get('image')
-            type = secure_filename(f.filename).split('.')[1]
-            if type not in ALLOWED_EXTENSIONS:
-                return 'Invalid type of file'
-            if f :
-                filename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename) )
-                f.save(filename)
-
-                
-            
-        elif request.form['url']:
-            try:
-                url = request.form.get('url')
-                print(url)
-                f = urllib.request.urlopen(url)
-                filename = url.split('/')[-1]
-                filename = secure_filename(filename)
-                
-                if filename:
-                    filename=os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    f.save(filename)
-            except:
-                    print('Cannot read image from url')
-        if filename:
-            fn = secure_filename(filename)[:-4]
-            min_side = 512
-            img = cv2.imread(filename)
-            size = img.shape
-            h, w  = size[0], size[1]
-            if max(w, h) > min_side:
-                img_pad = process_image(img)
-            else:
-                img_pad = img
-            cv2.imwrite(os.path.join(app.config['UPLOAD_FOLDER'],f'{fn}_resize.png'), img_pad)
-        
-            img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], f'{fn}_resize.png' ))
-            bounding_boxes, landmarks = detect_faces(img) # detect bboxes and landmarks for all faces in the image
-            pic_face_detect = show_results(img, bounding_boxes, landmarks) # visualize the results
-            pic_face_detect.save(os.path.join(app.config['UPLOAD_FOLDER'], f'{fn}_landmark.png' ) )
-            crop_size = 224
-            scale = crop_size / 112
-            reference = get_reference_facial_points(default_square = True) * scale
-            for i in range(len(landmarks)):
-                facial5points = [[landmarks[i][j], landmarks[i][j + 5]] for j in range(5)]
-                warped_face = warp_and_crop_face(np.array(img), facial5points, reference, crop_size=(crop_size, crop_size))
-                img_warped = Image.fromarray(warped_face)   
-                pic_face_crop = img_warped.save(os.path.join(UPLOAD_FOLDER, f'{fn}_{i}_crop.png' ) )
-
-            # face recognition 
-            cleb_name = []
-            for i in range(len(landmarks)):
-                name = models[version].predict(os.path.join(app.config['UPLOAD_FOLDER'], f'{fn}_{i}_crop.png'))
-                cleb_name.append(name)
-            
-            employeeList = []
-            for i in range(len(landmarks)):
-                for j in bounding_boxes:
-                    face = {
-                        "bounding_boxes": {
-                            "top": j[0],
-                            "right": j[1],
-                            "left": j[2],
-                            "bottom": j[3]},
-                        "landmark": landmarks[i],
-                        "prediction": cleb_name[i],
-                        "success": True}
-                employeeList.append(face)
-            
-
-                
-                
-                
-    return jsonify(jsanitize(employeeList))
-'''Predict'''
 @app.route('/predict',methods=['POST'])
 def predict_image():
     data = {'success':False}
@@ -190,7 +118,7 @@ def predict_image():
             else:
                 img_pad = img
             cv2.imwrite(os.path.join(app.config['UPLOAD_FOLDER'],f'{fn}_resize.png'), img_pad)
-        
+            
             img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], f'{fn}_resize.png' ))
             bounding_boxes, landmarks = detect_faces(img) # detect bboxes and landmarks for all faces in the image
             pic_face_detect = show_results(img, bounding_boxes, landmarks) # visualize the results
@@ -206,6 +134,7 @@ def predict_image():
 
             # face recognition 
             cleb_name = []
+            
             for i in range(len(landmarks)):
                 name = model.predict(os.path.join(app.config['UPLOAD_FOLDER'], f'{fn}_{i}_crop.png'))
                 cleb_name.append(name)
@@ -223,12 +152,8 @@ def predict_image():
                         "prediction": cleb_name[i],
                         "success": True}
                 employeeList.append(face)
-            
-
-                
-                
-                
     return jsonify(jsanitize(employeeList))
+
 
 @app.route('/update-data',methods=['POST'])
 def update_data():
@@ -237,17 +162,13 @@ def update_data():
         if request.form['datasetname']:
             try:
                 datasetid =  request.form.get('datasetname')
+                class_name = request.form['class_name']
                 file_name=[]
                 images = request.files.getlist('image')
-                for i in range(len(images)):     #image will be the key 
-                    img_name = images[i].filename
-                    file_name.append(img_name)
-                for i in range(len(images)):
-                    img_name = os.path.join(DATASET_BASE,datasetid,images[i].filename)
-                    images[i].save(img_name)
-                thread=ImportData(datasetid,update = True)
+                thread=UpdateData(datasetid,class_name,images)
                 thread.start()
-                data['file name'] = file_name
+                thread.join()
+                
                 data['success']=True
                 data['dataset name'] = datasetid
                 data['status'] = 'QUEUED'
@@ -259,10 +180,51 @@ def update_data():
                 return jsonify(data)
     return jsonify(data)
 
+'''train-model'''  
+@app.route('/train',methods=['POST'])
+def train_model():
+    data = {'success':False}
+    if request.method == 'POST':
+        if request.form['datasetid']:
+            dataset = request.form['datasetid']
+            modelname = request.form['modelname']
+            batch_size = request.form['batch_size']
+            if batch_size is None or batch_size=='':
+                batch_size = 16
+            else:
+                batch_size = int(batch_size)
+            
+            epochs = request.form['epochs']
+            if epochs is None or epochs=='':
+                epochs = 50
+            else:
+                epochs = int(epochs)
+                
+            lr = request.form['learningrate']
+            if lr is None or lr=='':
+                lr = 0.001
+            else:
+                lr = float(lr)
+   
+            types = request.form['type']
+            class_name = request.form['class_name']
+            if class_name is None or class_name =='':
+                class_name = 'none'
+            training_thread = TrainingThread(dataset,modelname,batch_size,epochs,lr,types,class_name)
+            training_thread.start()
+            
+            data['dataset id'] = dataset
+            data['model name'] = modelname
+            data['batch size'] = batch_size
+            data['epochs'] = epochs
+            data['learning rate'] = lr
+            data['type'] = types
+            data['success'] = True
+            return jsonify(data)
+    return jsonify(data)
 if __name__ == 'main':
     print('Please wait until all models are loader')
     print('Load model')
-    
     models_available = files.get_files_matching(settings.MODELS_ROOT)
 
     models = dict()
@@ -283,9 +245,7 @@ if __name__ == 'main':
 
     # https://stackoverflow.com/a/20423005/436721
     app.logger.setLevel(logging.INFO)
-
-    
-    app.run('0.0.0.0')
+    app.run('0.0.0.0',debug = True)
 else:
     
     models_available = files.get_files_matching(settings.MODELS_ROOT)

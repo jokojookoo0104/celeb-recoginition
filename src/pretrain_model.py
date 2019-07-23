@@ -37,11 +37,11 @@ def embeddingmodel():
     for i in range(len(metadata)):
         name.append(metadata[i].name)
     np.savetxt('/home/sbikevn360/celebrities-recognition/trained-models/embedding/name.txt', name,  delimiter=" ", fmt="%s")
+    return
 
-def pretrainSingleClass(datasetid):
+def pretrainSingleClass(datasetid,class_name):
     K.clear_session()
-    root = './face'
-    reader = LFWReader(dir_images=root,data_name = datasetid)
+    reader = LFWReader(dir_images=datasetid,class_name =class_name)
     gen_train = TripletGeneratorSingleID(reader)
     gen_test = TripletGeneratorSingleID(reader)
     embedding_model, triplet_model = GetModel()
@@ -62,3 +62,22 @@ def pretrainSingleClass(datasetid):
     embedding_model.save_weights('/home/sbikevn360/celebrities-recognition/trained-models/weights/weights_finetune_50_5.h5')
     K.clear_session()
     embeddingmodel()
+    return
+
+def importdata(datasetid,images):
+    root = './face'
+    list_classes = os.listdir(root)
+    for x in list_classes:
+        if x == datasetid:
+            for i in range(len(images)):
+                img_name = os.path.join(DATASET_BASE,datasetid,images[i].filename)
+                images[i].save(img_name)
+            return
+        else:
+            path= os.path.join(root,datasetid)
+            os.mkdir(path)
+            for i in range(len(images)):
+                img_name = os.path.join(DATASET_BASE,datasetid,images[i].filename)
+                images[i].save(img_name)
+            return
+    return

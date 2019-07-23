@@ -21,10 +21,9 @@ def _CountFiles(root):
 class DataSetReader:
     __metaclass__ = ABCMeta
 
-    def __init__(self, dir_images,data_name):
+    def __init__(self, dir_images):
         self.root = dir_images
         self.data_size = _CountFiles(self.root)
-        self.data_name = data_name
         
         
     @abstractmethod
@@ -34,16 +33,17 @@ class DataSetReader:
     def GetDataSize(self):
         return self.data_size
     
-    def GetTripletSingleID(self,data_name):
+    def GetTripletSingleID(self):
         pass
     
 class LFWReader(DataSetReader):
-    def __init__(self, dir_images,data_name):
-        super().__init__(dir_images,data_name)
-        
-        self.list_classes = os.listdir(self.root) #list
-        
-        self.class_idx = self.list_classes.index(self.data_name)
+    def __init__(self, dir_images,class_name=''):
+        super().__init__(dir_images)
+        self.dir_images = dir_images
+        self.list_classes = os.listdir(self.dir_images) #list
+        if class_name !='':
+            self.class_name = class_name
+            self.class_idx = self.list_classes.index(self.class_name)
         
         self.not_single = [c for c in self.list_classes if len(listdir(join(self.root, c)))>1] #list
         
@@ -83,7 +83,6 @@ class LFWReader(DataSetReader):
         path_neg = join(dir_neg, fileName_img_neg)
 
         return path_anchor, path_pos, path_neg
-    
     
     def GetTripletSingleID(self):
         idx_class_pos = self.class_idx
